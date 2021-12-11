@@ -1,125 +1,40 @@
 <?php
-
+/** @noinspection PhpUnused */
 namespace Vagento\FileGenerator\Generators;
 
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\View;
-
-abstract class StubFileGenerator
+class StubFileGenerator extends AbstractStubFileGenerator
 {
     /**
-     * Stub data for the generation.
+     * StubFileGenerator constructor.
      *
-     * @var array<string, mixed>
+     * @param string               $path
+     * @param string               $stubPath
+     * @param array<string, mixed> $stubData
      */
-    protected array $stubData = [];
-
-    /**
-     * Get the path of the file.
-     *
-     * @return string
-     */
-    abstract public function getPath(): string;
-
-    /**
-     * Get the path of the stub file.
-     *
-     * @return string
-     */
-    abstract public function getStubPath(): string;
-
-    /**
-     * Get the data for the stub generation.
-     *
-     * @return array<string, mixed>
-     */
-    public function getStubData(): array
+    public function __construct(string $path = '', string $stubPath = '', array $stubData = [])
     {
-        return [];
-    }
-
-    /**
-     * Set stub data for the stub generation.
-     *
-     * @param array $stubData
-     * @return $this
-     */
-    public function setStubData(array $stubData): static
-    {
+        $this->path = $path;
+        $this->stubPath = $stubPath;
         $this->stubData = $stubData;
-
-        return $this;
     }
 
     /**
-     * Add stub data for the stub generation.
-     *
-     * @param array $stubData
-     * @return $this
-     */
-    public function addStubData(array $stubData): static
-    {
-        $this->stubData = array_merge($this->stubData, $stubData);
-
-        return $this;
-    }
-
-    /**
-     * Generates the file.
-     *
-     * @return $this
-     */
-    public function generate(): self
-    {
-        // Get stub data
-        $stubData = array_merge($this->getStubData(), $this->stubData);
-
-        // Get the contents
-        $contents = View::file($this->getStubPath(), $stubData)
-            ->render();
-
-        // Write the file
-        File::ensureDirectoryExists(dirname($this->getPath()));
-        File::put($this->getPath(), $contents);
-
-        return $this;
-    }
-
-    /**
-     * Get the content of the file.
+     * Get the path of the file which will be generated.
      *
      * @return string
      */
-    public function getFileContent(): string
+    public function getPath(): string
     {
-        if (!$this->fileExists()) {
-            $this->generate();
-        }
-
-        return file_get_contents($this->getPath());
+        return '';
     }
 
     /**
-     * Get the content of the file by requiring the file.
+     * Get the path to the stub file.
      *
-     * @return mixed
+     * @return string
      */
-    public function require(): mixed
+    public function getStubPath(): string
     {
-        if (!$this->fileExists()) {
-            $this->generate();
-        }
-
-        return require $this->getPath();
-    }
-
-    /**
-     * Checks if the file exists.
-     *
-     * @return bool
-     */
-    public function fileExists(): bool
-    {
-        return file_exists($this->getPath());
+        return '';
     }
 }

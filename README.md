@@ -1,6 +1,6 @@
 <h1 align="center">Vagento - File Generator</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-1.0.1-blue.svg?cacheSeconds=2592000" />
   <a href="https://opensource.org/licenses/MIT" target="_blank">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" />
   </a>
@@ -21,24 +21,24 @@ composer require vagento/file-generator
 
 <details>
 <summary>
-<b>Stub File Generator</b>
+<b>Stub File Generator - From class</b>
 </summary>
 
-Create a new class that extends the `\Vagento\FileGenerator\StubFileGenerator` class.<br>
-And add the required methods to the class:
+1. Create a new **class** which extends the `\Vagento\FileGenerator\AbstractStubFileGenerator` class.<br>
+And add the **getter methods** to the class:
 
 ```php
-use Vagento\FileGenerator\StubFileGenerator;
+use Vagento\FileGenerator\AbstractStubFileGenerator;
 
-class MyClass extends StubFileGenerator
+class MyFileGenerator extends AbstractStubFileGenerator
 {
-    // This is the path to the file that will be generated
+    // Required: This is the path to the file that will be generated
     public function getPath(): string
     {
         return 'path/to/fileToGenerate.php';    
     }
     
-    // This is the path to the stub file
+    // Required: This is the path to the stub file
     public function getStubPath(): string
     {
         return __DIR__ . '/stubs/file.blade.php';    
@@ -53,32 +53,91 @@ class MyClass extends StubFileGenerator
 }
 ```
 
-Now create a new stub file, which must end with `.blade.php`.<br>
-You can use the blade syntax:
+2. Create a new **stub file**, which must end with `.blade.php`.<br>
+You can use the **blade syntax**:
 
 ```
 Filename: file.blade.php
 Always: {{ $always }}
-Other: {{ $other }}
 ```
 
-Create a new instance of the class and call the `generate()` method.
+3. Create a new **instance of the class** and call the `generate()` method.<br>
+   You can also chain the methods.
 
 ```php
-$myClass = new MyClass();
-
-// Optional: Add stub data
-$myClass->addStubData(['other' => 10]);
+$generator = new MyFileGenerator();
 
 // Generate the file
-$myClass->generate();
+$generator->generate();
 ```
 
-which will result in the following file:
+Which will result in the following file:
 ```
 Filename: file.blade.php
 Always: 5
-Other: 10
+```
+
+The `generate()` method will generate the file and overwrite any existing file.
+</details>
+
+<br>
+
+<details>
+<summary>
+<b>Stub File Generator - From setters</b>
+</summary>
+
+1. Create a new **stub file**, which must end with `.blade.php`.<br>
+You can use the **blade syntax**:
+
+```
+Filename: file.blade.php
+Data to add: {{ $dataToAdd }}
+```
+
+2. Create a new **instance of the class** and call the `generate()` method.<br>
+   You can use the **constructor** or use the **methods** (or **chain** them).
+
+```php
+$generator = new \Vagento\FileGenerator\Generators\StubFileGenerator(
+    'path/to/fileToGenerate.php', // Path to the file which will be generated
+    __DIR__ . '/stubs/file.blade.php', // Path to the stub file
+    ['dataToAdd' => 10] // Optional: Data that will be passed to the stub file
+);
+
+// Generate the file
+$generator->generate();
+
+// OR
+
+$generator = new \Vagento\FileGenerator\Generators\StubFileGenerator();
+
+// Set the path to the file which will be generated
+$generator->setPath('path/to/fileToGenerate.php');
+
+// Set the path to the stub file
+$generator->setStubPath(__DIR__ . '/stubs/file.blade.php');
+
+// Optional: Add data to the stub file
+$generator->addStubData(['dataToAdd', 10]);
+
+// Generate the file
+$generator->generate();
+
+// OR
+
+// Chain methods
+$generator->setPath('path/to/fileToGenerate.php')
+    ->setStubPath(__DIR__ . '/stubs/file.blade.php')
+    ->addStubData(['dataToAdd', 10])
+    ->generate();
+```
+
+Which will result in the following file:
+
+```
+Filename: file.blade.php
+Data to add: 10
 ```
 
 The `generate()` method will generate the file and overwrite any existing file.
